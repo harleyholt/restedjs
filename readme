@@ -1,0 +1,3 @@
+restedjs is a minimal REST controller implementation for Express. What it brings is the ability to create RESTful services easily.
+
+Most importantly it brings the idea of heirarchical data by allowing each handler in a RESTful URL to respond to the request before finally being handled by the requested URL handler.
