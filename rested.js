@@ -1,4 +1,14 @@
 var methods = ['get', 'post', 'put', 'delete'];
+
+function authorize(handler, on_error, req, res, next) {
+	if ( handler.authorize ) {
+		if ( !handler.authorize(req) ) {
+			return;
+		}
+	} 
+	handler(req, res, next);
+}
+
 function rested(app, path, controller) {
 	//TODO: this only works for string paths, will fail if a regex was used
 
@@ -23,7 +33,14 @@ function rested(app, path, controller) {
 			if ( controller.passthrough ) {
 				args.push(controller.passthrough);
 			}
-			args.push(controller[methods[i]]);
+			args.push(function(handler, on_error) {
+				if ( !on_error ) {
+					on_error = function() {}
+				}
+				return function(req, res, next) {
+					authorize(handler, on_error, req, res, next);
+				}
+			}(controller[methods[i]]));
 			app[methods[i]].apply(app, args);
 		}
 	}
